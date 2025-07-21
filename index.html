@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Bootstrap Flex プレビュー</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* 追加は最低限：プレビューboxサイズ調整用 */
+    .preview-box {
+      width: 120px;
+      height: 120px;
+      background: #6c757d;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0.5rem;
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin: 0.5rem;
+    }
+    .flex-parent {
+      min-height: 300px;
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      transition: all 0.2s;
+    }
+    .class-display {
+      font-family: "Fira Mono", "Consolas", monospace;
+      background: #e9ecef;
+      padding: 0.5em 1em;
+      border-radius: 0.3em;
+      margin-top: 0.5em;
+      font-size: 1em;
+    }
+  </style>
+</head>
+<body class="container py-4">
+  <h2 class="mb-4">Bootstrap Flex クラス プレビュー</h2>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="mb-3">
+        <label class="form-label">表示方向 <small>(flex-direction)</small></label>
+        <select id="direction" class="form-select">
+          <option value="flex-row">横並び (row)</option>
+          <option value="flex-column">縦並び (column)</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">水平方向揃え <small>(justify-content)</small></label>
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-outline-primary" data-justify="justify-content-start">start</button>
+          <button type="button" class="btn btn-outline-primary" data-justify="justify-content-center">center</button>
+          <button type="button" class="btn btn-outline-primary" data-justify="justify-content-end">end</button>
+          <button type="button" class="btn btn-outline-primary" data-justify="justify-content-between">between</button>
+          <button type="button" class="btn btn-outline-primary" data-justify="justify-content-around">around</button>
+          <button type="button" class="btn btn-outline-primary" data-justify="justify-content-evenly">evenly</button>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">垂直方向揃え <small>(align-items)</small></label>
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-outline-success" data-align="align-items-start">start</button>
+          <button type="button" class="btn btn-outline-success" data-align="align-items-center">center</button>
+          <button type="button" class="btn btn-outline-success" data-align="align-items-end">end</button>
+          <button type="button" class="btn btn-outline-success" data-align="align-items-baseline">baseline</button>
+          <button type="button" class="btn btn-outline-success" data-align="align-items-stretch">stretch</button>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">その他オプション</label>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="wrap" value="flex-wrap">
+          <label class="form-check-label" for="wrap">flex-wrap</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="nowrap" value="flex-nowrap">
+          <label class="form-check-label" for="nowrap">flex-nowrap</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="fill" value="flex-fill">
+          <label class="form-check-label" for="fill">flex-fill（子要素が均等拡張）</label>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div id="flex-parent" class="flex-parent d-flex flex-row justify-content-center align-items-center">
+        <div class="preview-box">Box1</div>
+        <div class="preview-box">Box2</div>
+        <div class="preview-box">Box3</div>
+      </div>
+      <div>
+        <strong>現在のクラス:</strong>
+        <span id="class-display" class="class-display"></span>
+      </div>
+    </div>
+  </div>
+
+  <footer class="mt-5 text-muted text-center">
+    <small>Bootstrap Flex Utility サンプル</small>
+  </footer>
+
+  <script>
+    // 初期値
+    let direction = 'flex-row';
+    let justify = 'justify-content-center';
+    let align = 'align-items-center';
+    let options = [];
+
+    // 各UI要素取得
+    const flexParent = document.getElementById('flex-parent');
+    const classDisplay = document.getElementById('class-display');
+    const directionSel = document.getElementById('direction');
+    const justifyBtns = document.querySelectorAll('[data-justify]');
+    const alignBtns = document.querySelectorAll('[data-align]');
+    const wrapCheck = document.getElementById('wrap');
+    const nowrapCheck = document.getElementById('nowrap');
+    const fillCheck = document.getElementById('fill');
+
+    // クラス更新関数
+    function updateFlexClass() {
+      // fillは子要素用
+      let parentClasses = ['d-flex', direction, justify, align];
+      if (wrapCheck.checked) parentClasses.push('flex-wrap');
+      if (nowrapCheck.checked) parentClasses.push('flex-nowrap');
+      flexParent.className = 'flex-parent ' + parentClasses.join(' ');
+
+      // fill処理
+      document.querySelectorAll('.preview-box').forEach(box => {
+        box.classList.toggle('flex-fill', fillCheck.checked);
+      });
+
+      // クラス表示
+      classDisplay.textContent = parentClasses.join(' ')
+        + (fillCheck.checked ? '（子要素: flex-fill）' : '');
+    }
+
+    // 方向
+    directionSel.addEventListener('change', e => {
+      direction = e.target.value;
+      updateFlexClass();
+    });
+
+    // 水平揃え
+    justifyBtns.forEach(btn => {
+      btn.addEventListener('click', e => {
+        justify = btn.getAttribute('data-justify');
+        justifyBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        updateFlexClass();
+      });
+      // 初期active
+      if (btn.getAttribute('data-justify') === justify) btn.classList.add('active');
+    });
+
+    // 垂直揃え
+    alignBtns.forEach(btn => {
+      btn.addEventListener('click', e => {
+        align = btn.getAttribute('data-align');
+        alignBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        updateFlexClass();
+      });
+      // 初期active
+      if (btn.getAttribute('data-align') === align) btn.classList.add('active');
+    });
+
+    // オプション
+    [wrapCheck, nowrapCheck, fillCheck].forEach(el => {
+      el.addEventListener('change', updateFlexClass);
+    });
+
+    // 初期表示
+    updateFlexClass();
+  </script>
+</body>
+</html>
